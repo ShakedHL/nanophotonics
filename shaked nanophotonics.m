@@ -53,5 +53,3 @@ hold off;
 % Display the fitting parameters
 disp('Fitting parameters (a * exp(b * N) + c):');
 disp(b_fit);
-
-fgszirfhirgrsfkuj
