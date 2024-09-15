@@ -1,3 +1,5 @@
+%סעיף א 
+
 % Constants
 n_air = 1.0;    % Refractive index of air
 n1 = 1.5;       % Refractive index of first layer (closest to air)
@@ -54,4 +56,70 @@ hold off;
 disp('Fitting parameters (a * exp(b * N) + c):');
 disp(b_fit);
 
+%סעיף ב
+
+% Constants
+n_air = 1.0;        % Refractive index of air
+n1 = 1.5;          % Refractive index of first layer (closest to air)
+n2 = 1.6;          % Refractive index of second layer (closest to substrate)
+n_substrate = 1.5; % Refractive index of substrate
+N = 50;            % Number of layer pairs
+wavelength_range = linspace(1e-6, 2e-6, 500); % Wavelength range from 1 to 2 microns
+
+% Angles of incidence (in degrees)
+angles = [0, 15, 30, 45, 60];
+
+% Initialize reflection intensity results
+reflection_results = zeros(length(angles), length(wavelength_range));
+
+% Calculate reflection intensity for each wavelength and angle
+for a = 1:length(angles)
+    theta_deg = angles(a);
+    theta_rad = deg2rad(theta_deg);
+    
+    for w = 1:length(wavelength_range)
+        wavelength = wavelength_range(w);
+        
+        % Initialize total reflection coefficients
+        r_total_parallel = 0;
+        r_total_perpendicular = 0;
+        
+        for j = 1:N
+            % Calculate Fresnel coefficients for the current layer
+            [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, theta_rad);
+            
+            % Sum the reflection coefficients over all layers
+            r_total_parallel = r_total_parallel + r_parallel;
+            r_total_perpendicular = r_total_perpendicular + r_perpendicular;
+        end
+        
+        % Calculate total reflection intensity (average of both polarizations)
+        reflection_parallel = abs(r_total_parallel)^2;
+        reflection_perpendicular = abs(r_total_perpendicular)^2;
+        reflection_results(a, w) = (reflection_parallel + reflection_perpendicular) / 2;
+    end
+end
+
+% Plot reflection intensity vs wavelength for different angles
+figure;
+hold on;
+for a = 1:length(angles)
+    plot(wavelength_range * 1e6, reflection_results(a, :), 'DisplayName', [num2str(angles(a)), '°']);
+end
+xlabel('Wavelength (\mum)');
+ylabel('Reflection Intensity');
+title('Reflection Intensity vs Wavelength for Various Angles of Incidence');
+legend('show');
+grid on;
+hold off;
+
+% Function to calculate Fresnel coefficients for parallel and perpendicular polarization
+function [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, theta1)
+    % Snell's law
+    theta2 = asin((n1 / n2) * sin(theta1));
+    
+    % Fresnel reflection coefficients for parallel and perpendicular polarization
+    r_parallel = (n1 * cos(theta1) - n2 * cos(theta2)) / (n1 * cos(theta1) + n2 * cos(theta2));
+    r_perpendicular = (n2 * cos(theta1) - n1 * cos(theta2)) / (n2 * cos(theta1) + n1 * cos(theta2));
+end
 
