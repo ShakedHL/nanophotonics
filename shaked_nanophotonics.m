@@ -187,3 +187,72 @@ function [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, theta1)
     r_parallel = (n1 * cos(theta1) - n2 * cos(theta2)) / (n1 * cos(theta1) + n2 * cos(theta2));
     r_perpendicular = (n2 * cos(theta1) - n1 * cos(theta2)) / (n2 * cos(theta1) + n1 * cos(theta2));
 end
+
+%סעיף ד
+%ד.1
+% Constants for Q-factor calculation
+N_values = [10, 20, 50];  % Number of layer pairs for each case
+wavelength_resonance = 1.5e-6;  % Resonance wavelength (1.5 microns)
+delta_lambda = 1e-9;  % Small step around resonance to observe transmission
+
+% Define wavelength range around resonance (to calculate transmission)
+wavelength_range = linspace(wavelength_resonance - 10 * delta_lambda, wavelength_resonance + 10 * delta_lambda, 1000);
+
+% Initialize array for Q-factor results
+Q_factor_results = zeros(1, length(N_values));
+
+% Loop over different values of N (number of layer pairs)
+for k = 1:length(N_values)
+    N = N_values(k);
+    
+    % Initialize transmission intensity results
+    transmission_intensity = zeros(1, length(wavelength_range));
+    
+    % Calculate transmission intensity for each wavelength
+    for w = 1:length(wavelength_range)
+        wavelength = wavelength_range(w);
+        
+        % Initialize total reflection and transmission coefficients
+        r_total_parallel = 0;
+        r_total_perpendicular = 0;
+        t_total_parallel = 0;  % For transmission
+        
+        for j = 1:N
+            % Calculate Fresnel coefficients for each layer
+            [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, 0);  % Normal incidence
+            
+            % Accumulate reflection and transmission coefficients
+            r_total_parallel = r_total_parallel + r_parallel;
+            r_total_perpendicular = r_total_perpendicular + r_perpendicular;
+            t_total_parallel = t_total_parallel + (1 - r_parallel);  % Transmission
+        end
+        
+        % Calculate total transmission intensity (T = |t|^2)
+        transmission_intensity(w) = abs(t_total_parallel)^2;
+    end
+    
+    % Plot transmission intensity vs wavelength for the current N
+    figure;
+    plot(wavelength_range * 1e6, transmission_intensity);
+    xlabel('Wavelength (\mum)');
+    ylabel('Transmission Intensity');
+    title(['Transmission vs Wavelength for N = ', num2str(N)]);
+    grid on;
+    
+    % Calculate Q-factor from the transmission curve
+    [max_val, max_idx] = max(transmission_intensity);
+    FWHM_idx = find(transmission_intensity >= max_val / 2);  % Full Width Half Maximum (FWHM)
+    
+    % Wavelength corresponding to FWHM
+    lambda_FWHM = wavelength_range(FWHM_idx(end)) - wavelength_range(FWHM_idx(1));
+    
+    % Q-factor calculation
+    Q_factor_results(k) = wavelength_resonance / lambda_FWHM;
+end
+
+% Display the Q-factor results
+disp('Q-factor for different N values:');
+disp(Q_factor_results);
+
+
+
