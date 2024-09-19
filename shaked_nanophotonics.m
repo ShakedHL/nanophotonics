@@ -189,17 +189,18 @@ function [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, theta1)
 end
 
 %סעיף ד
-%ד.1
-% Constants for Q-factor calculation
-N_values = [10, 20, 50];  % Number of layer pairs for each case
+
+% Constants
+n_air = 1.0;        % Refractive index of air
+n1 = 1.5;           % Refractive index of first layer (closest to air)
+n2 = 1.6;           % Refractive index of second layer (closest to substrate)
+n_substrate = 1.5;  % Refractive index of substrate
+N_values = [10, 20, 50];  % Number of layer pairs
 wavelength_resonance = 1.5e-6;  % Resonance wavelength (1.5 microns)
-delta_lambda = 1e-9;  % Small step around resonance to observe transmission
+delta_lambda = 1e-9;  % Step size around resonance
 
 % Define wavelength range around resonance (to calculate transmission)
 wavelength_range = linspace(wavelength_resonance - 10 * delta_lambda, wavelength_resonance + 10 * delta_lambda, 1000);
-
-% Initialize array for Q-factor results
-Q_factor_results = zeros(1, length(N_values));
 
 % Loop over different values of N (number of layer pairs)
 for k = 1:length(N_values)
@@ -214,16 +215,14 @@ for k = 1:length(N_values)
         
         % Initialize total reflection and transmission coefficients
         r_total_parallel = 0;
-        r_total_perpendicular = 0;
         t_total_parallel = 0;  % For transmission
         
         for j = 1:N
             % Calculate Fresnel coefficients for each layer
-            [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, 0);  % Normal incidence
+            [r_parallel, ~] = fresnel_coefficients(n1, n2, 0);  % Normal incidence
             
             % Accumulate reflection and transmission coefficients
             r_total_parallel = r_total_parallel + r_parallel;
-            r_total_perpendicular = r_total_perpendicular + r_perpendicular;
             t_total_parallel = t_total_parallel + (1 - r_parallel);  % Transmission
         end
         
@@ -247,12 +246,44 @@ for k = 1:length(N_values)
     lambda_FWHM = wavelength_range(FWHM_idx(end)) - wavelength_range(FWHM_idx(1));
     
     % Q-factor calculation
-    Q_factor_results(k) = wavelength_resonance / lambda_FWHM;
+    Q_factor = wavelength_resonance / lambda_FWHM;
+    
+    % Display the Q-factor result
+    disp(['Q-factor for N = ', num2str(N), ': ', num2str(Q_factor)]);
 end
 
-% Display the Q-factor results
-disp('Q-factor for different N values:');
-disp(Q_factor_results);
+% Theoretical Q-factor calculation based on reflectivity
+Q_theoretical = zeros(1, length(N_values));
+
+for k = 1:length(N_values)
+    N = N_values(k);
+    
+    % Calculate reflectivity for N layers (using Fresnel reflection)
+    r_total_parallel = 0;
+    
+    for j = 1:N
+        % Fresnel coefficients for each layer
+        [r_parallel, ~] = fresnel_coefficients(n1, n2, 0);  % Normal incidence
+        r_total_parallel = r_total_parallel + r_parallel;
+    end
+    
+    % Reflectivity R = |r|^2
+    R = abs(r_total_parallel)^2;
+    
+    % Q-factor calculation based on reflectivity
+    Q_theoretical(k) = (pi * sqrt(R)) / (1 - R);
+end
+
+% Display the theoretical Q-factor results
+disp('Theoretical Q-factor for different N values:');
+disp(Q_theoretical);
+
+% Function to calculate Fresnel coefficients for parallel and perpendicular polarization
+function [r_parallel, r_perpendicular] = fresnel_coefficients(n1, n2, theta1)
+    theta2 = asin((n1 / n2) * sin(theta1));  % Snell's law
+    r_parallel = (n1 * cos(theta1) - n2 * cos(theta2)) / (n1 * cos(theta1) + n2 * cos(theta2));
+    r_perpendicular = (n2 * cos(theta1) - n1 * cos(theta2)) / (n2 * cos(theta1) + n1 * cos(theta2));
+end
 
 
 
