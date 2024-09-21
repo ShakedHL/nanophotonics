@@ -1,6 +1,6 @@
-clc, clearvars
+%% Question 3: Ring Resonator Analysisclc, clearvars
 
-%% Question 3: Ring Resonator Analysis
+clc, clearvars 
 
 %% Load Data
 load('data_NOTUSE.m.mat');
