@@ -3,47 +3,6 @@
 clc, clearvars
 
 %סעיף א
-
-%{
-% Parameters
-n_eff = 2.8339;     % Effective refractive index
-lambda = 1.55e-6;   % Wavelength in meters (1.55 micrometers)
-m = -1;             % Order of diffraction
-theta_inc = 10;     % Incident angle of the light (degrees)
-
-% Convert the angle to radians
-theta_inc_rad = deg2rad(theta_inc);
-
-Lambda = lambda / (n_eff - n_air*sin(theta_i_rad));
-
-% Displaying the result
-disp('lattice periodicity Λ:');
-disp(Lambda);
-
-% Using the grating equation: m*lambda = d*(sin(theta))
-% Calculate the grating spacing (d)
-d = (m * lambda) / sin(theta_inc_rad);
-
-% Display the result
-fprintf('The grating spacing d is: %.6e meters\n', d);
-
-% Calculate the diffraction angle inside the material using Snell's law
-theta_diff_rad = asin((sin(theta_inc_rad) * n_eff) / 1);  % n_air = 1
-
-% Convert the angle to degrees
-theta_diff = rad2deg(theta_diff_rad);
-
-fprintf('The diffraction angle is: %.2f degrees\n', theta_diff);
-
-% Given or calculated grating spacing (d from previous calculations)
-% Assuming d is already calculated
-Lambda = 1 / d;  % Grating periodicity
-
-% Display the result
-fprintf('The grating periodicity Λ is: %.6e meters\n', Lambda);
-
-
-
 % Parameters
 lambda_0 = 1.55e-6;    % Wavelength in meters (e.g., 1.55 micrometers)
 n_eff = 2.8339;        % Effective refractive index
@@ -59,98 +18,54 @@ Lambda = lambda_0 / (n_eff - n_a * sin(theta_a_rad));
 % Display the result
 fprintf('The grating periodicity Λ is: %.6e meters\n', Lambda);
 
+% Parameters
+n_eff = 2.8339;             % Effective refractive index
+n_air = 1;                  % Refractive index of air
+lambda = 1.55e-6;           % Wavelength in meters
+m = -1;                     % Diffraction order
+theta_i_deg = 10;           % Entry angle in degrees
 
+% Convert the entry angle to radians
+theta_i_rad = deg2rad(theta_i_deg);
 
-%סעיף ב 
-%Parameters
-n_eff = 2.8339;
-n_air=1;
-lambda = 1.55e-6;
-m = -1;
-theta_i_deg = 10;
-
-theta_i_rad = deg2rad(theta_i_deg);% Convert the entry angle to radians
-
-%Calculation of lattice periodicity
-Lambda = lambda / (n_eff - n_air*sin(theta_i_rad));
-
-% Displaying the result
-disp('lattice periodicity Λ:');
-disp(Lambda);
-
-
-% Structural data from fabrication
-initial_n_eff = 2.8339; % original effective index of refraction
-period = Lambda; % from the previous calculation
-m = -1; % diffraction order
-
-% Define the changes in effective index of refraction
-delta_n_center = 0.03; % change at the center of the wafer
-delta_n_edge = 0.06; % change at the edges of the wafer
+%סעיףב
+% Structural data and refractive index changes
+initial_n_eff = 2.8339;     % Original effective index of refraction
+period = Lambda ;
+delta_n_center = 0.03;      % Change at the center of the wafer
+delta_n_edge = 0.06;        % Change at the edges of the wafer
 
 % Calculate new effective indices
 n_eff_center = initial_n_eff + delta_n_center;
 n_eff_edge = initial_n_eff + delta_n_edge;
 
-% Calculate the corresponding angles
-theta_i_center = asin(n_eff_center-lambda/period);
-theta_i_edge = asin(n_eff_edge-lambda/period);
+% calculation of the corresponding angles (subtracting lambda from n_eff)
+theta_i_center = asin(n_eff_center - lambda / period);
+theta_i_edge = asin(n_eff_edge - lambda / period);
 
-% Convert radian to degree for better visualization
+% Convert radians to degrees for better visualization
 theta_i_center_deg = rad2deg(theta_i_center);
 theta_i_edge_deg = rad2deg(theta_i_edge);
 
 % Display the results
-disp('Corresponding angle at the center (with a Δn of 0.03):');
+disp('angle at the center (with Δn of 0.03):');
 disp(theta_i_center_deg);
 
-disp('Corresponding angle at the edges (with a Δn of 0.06):');
+disp('angle at the edges (with Δn of 0.06):');
 disp(theta_i_edge_deg);
 
-%}
+%סעיף ג 
+new_lambda_center= (n_eff_center-sin(theta_i_rad))*period;
+new_lambda_edge= (n_eff_edge-sin(theta_i_rad))*period;
+disp('New_lambda for center:');
+disp(new_lambda_center);
 
-% Given parameters
-n_eff_initial = 2.8339;    % Initial effective refractive index
-n_external = 1;            % Refractive index of external medium (air)
-wavelength = 1.55*10^(-6);      % Wavelength of light in meters
-order_diffraction = -1;    % Diffraction order
-input_angle_deg = 10;      % Incident angle in degrees
+disp('New_lambda for edge:');
+disp(new_lambda_edge);
 
-% Convert incident angle to radians
-input_angle_rad = deg2rad(input_angle_deg);
+lambda_center_updated = (n_eff_center - sin(theta_i_rad)) * period;
+lambda_edge_updated = (n_eff_edge - sin(theta_i_rad)) * period;
 
-% Compute grating period (Λ) using the given formula
-grating_period = wavelength / (n_eff_initial - n_external * sin(input_angle_rad));
+fprintf('Updated lambda for center: %.4f\n', lambda_center_updated);
+fprintf('Updated lambda for edge: %.4f\n', lambda_edge_updated);
 
-% Display the grating period
-disp('Calculated grating period Λ:');
-disp(grating_period);
-
-% Structural adjustments and data
-n_eff_base = 2.8339;       % Base effective refractive index
-period_value = grating_period; % Grating period from previous calculation
-order_diff = -1;           % Order of diffraction
-
-% Adjustments in effective index of refraction at different points
-delta_n_center = 0.03;     % Change at the center of the grating
-delta_n_edge = 0.06;       % Change at the edges of the grating
-
-% Recalculate the effective indices for the center and edges
-n_eff_center_adj = n_eff_base + delta_n_center;
-n_eff_edge_adj = n_eff_base + delta_n_edge;
-
-% Calculate corresponding diffraction angles using the diffraction equation
-angle_center_rad = asin(abs(order_diff) * wavelength / (n_eff_center_adj * period_value));
-angle_edge_rad = asin(abs(order_diff) * wavelength / (n_eff_edge_adj * period_value));
-
-% Convert radians to degrees for output
-angle_center_deg = rad2deg(angle_center_rad);
-angle_edge_deg = rad2deg(angle_edge_rad);
-
-% Display the corresponding angles for center and edges
-disp('Angle at the center (with Δn of 0.03):');
-disp(angle_center_deg);
-
-disp('Angle at the edges (with Δn of 0.06):');
-disp(angle_edge_deg);
-%}

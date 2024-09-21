@@ -328,3 +328,35 @@ alpha_loss_dB = (4.34 * pi / (free_spectral_range * L_total)* full_width_half_ma
 fprintf('The alpha_dB is: %.2f\n', alpha_loss_dB*0.01);
 %}
 
+%Q4_NANO_FINAL
+% Parameters
+refractive_index = 2.8339;    % Effective refractive index of the material
+light_wavelength = 1.55e-6;   % Light wavelength in meters
+diffraction_order = -1;       % Order of diffraction (absolute value used)
+entry_angle_deg = 10;         % Entry angle in degrees
+
+% Convert the incident angle to radians
+entry_angle_rad = deg2rad(entry_angle_deg);
+
+% Grating equation: |diffraction_order| * light_wavelength = spacing * sin(entry_angle)
+% Calculate the spacing of the grating
+grating_spacing = abs(diffraction_order) * light_wavelength / sin(entry_angle_rad);
+
+% Display the calculated spacing
+fprintf('The calculated grating spacing is: %.6e meters\n', grating_spacing);
+
+% Use Snell's law to determine the diffraction angle inside the material
+diffraction_angle_internal_rad = asin((sin(entry_angle_rad) * refractive_index) / 1); % n_air = 1
+
+% Convert the internal diffraction angle to degrees
+diffraction_angle_deg = rad2deg(diffraction_angle_internal_rad);
+
+% Display the diffraction angle
+fprintf('The diffraction angle inside the material is: %.2f degrees\n', diffraction_angle_deg);
+
+% Compute the grating periodicity (inverse of spacing)
+grating_periodicity = 1 / grating_spacing;
+
+% Display the grating periodicity
+fprintf('The grating periodicity is: %.6e meters\n', grating_periodicity);
+
