@@ -39,13 +39,12 @@ legend('Calculated Reflectance', 'Tanh Approximation');
 grid on;
 
 %% Section B: Reflectance vs Wavelength for Different Angles
-num_pairs = 50;                        % Fix number of pairs
-angles_deg = [0:15:60];                 % Set of angles in degrees
-angles_rad = deg2rad(angles_deg);       % Convert angles to radians
-lambda_range = linspace(1e-6, 2e-6, 500); % Wavelength range
-
+num_pairs = 50;                        
+angles_deg = [0:15:60];                 
+angles_rad = deg2rad(angles_deg);       
+lambda_range = linspace(1e-6, 2e-6, 500); 
 for j = 1:length(angles_rad)
-    reflectance_wavelength = zeros(size(lambda_range)); % Initialize reflectance matrix
+    reflectance_wavelength = zeros(size(lambda_range)); 
 
     theta1 = asin((n_air / n_high) * sin(angles_rad(j)));
     D_air = [1, 1; n_air * cos(angles_rad(j)), -n_air * cos(angles_rad(j))];
@@ -84,12 +83,12 @@ end
 
 %% Section C: Reflection with Layer Expansion
 clear;
-lambda_design = 1.5e-6; % Design wavelength
-n_high = 1.5;           % High refractive index layer
-n_low = 1.6;            % Low refractive index layer
-n_air = 1.0;            % Air refractive index
-num_pairs = 50;         % Number of pairs
-theta_incident = 0;     % Incident angle
+lambda_design = 1.5e-6; 
+n_high = 1.5;           
+n_low = 1.6;            
+n_air = 1.0;            
+num_pairs = 50;         
+theta_incident = 0;     
 layer_thickness = (0:0.01:2) * 10e-6;
 
 D_air = [1, 1; n_air, -n_air];
@@ -137,12 +136,12 @@ grid on;
 
 %% Section D: Reflection vs Wavelength
 clear;
-lambda_design = 1.5e-6; % Wavelength in meters
-n_high = 1.5;           % High refractive index layer
-n_low = 1.6;            % Low refractive index layer
-n_air = 1.0;            % Refractive index of air
-num_pairs = 10;         % Number of layer pairs
-theta = 0;              % Incident angle
+lambda_design = 1.5e-6; 
+n_high = 1.5;           
+n_low = 1.6;            
+n_air = 1.0;          
+num_pairs = 10;         
+theta = 0;              
 wavelength_range = linspace(1e-6, 2e-6, 2000);
 d_layer = 20 * 10^-6;
 
