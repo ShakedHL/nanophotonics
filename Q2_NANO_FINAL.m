@@ -1,4 +1,4 @@
-%Q2 plasmon
+%Q2 
 
 % Clear workspace and close all figures
 clear;
